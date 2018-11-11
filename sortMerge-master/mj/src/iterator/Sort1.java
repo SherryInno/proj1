@@ -476,7 +476,8 @@ public class Sort1 extends Iterator implements GlobalConst {
 				  continue;                                // Process next equivalence class
 				}
 			      else
-				{
+				
+			      {
 				  io_buf2.reread();
 				  _tuple2= io_buf2.Get( TempTuple2);
 				}
@@ -508,8 +509,41 @@ public class Sort1 extends Iterator implements GlobalConst {
 
     public void close() 
         throws JoinsException, 
-            IOException
+            IOException, IOException, IndexException
     {
+    //Unsure where closeFlag is defined
+    
+    if(!closeFlag){
+    try{
+    // Attempting to close both Iterators
+    am1s.close();
+    am2s.close()
+    }catch (Exception e){
+     throw new JoinsException(e, "Iterator connection was unsuccessful in closing");   
+     }
+     
+     if( outerHeap != null){
+     try{
+     	outerHeap.deleteFile();
+     }
+     catch(Exception e)
+     {
+     	throw new JoinsException(e, "File deletion was unsuccessful");
+     }
+     
+     outerHeap = null;
+     
+     if (innerHeap != null){
+     try{
+     	innerHeap.deleteFile();
+	}
+    catch (Exception e) {
+    throw new JoinsException(e, "File deletion was unsuccessful");
+    }
+    innerHeap = null
+    }
+    closeFlag = true;
+    }
+    
     } // End of close
-
 } // End of CLASS SortMerge
